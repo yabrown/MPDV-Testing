@@ -1,0 +1,48 @@
+[UTC 2022-12-18 14:07:43] Result of "ip a show enp1s0 | grep inet6 | grep global" at vultrtoronto:     inet6 2001:19f0:b001:55b:5400:4ff:fe3f:1da3/64 scope global dynamic mngtmpaddr noprefixroute 
+
+[UTC 2022-12-18 14:07:43] Result of "ip a show enp1s0 | grep inet6 | grep global" at vultratlanta:     inet6 2001:19f0:5401:2348:5400:4ff:fe3f:1da4/64 scope global dynamic mngtmpaddr noprefixroute 
+
+[UTC 2022-12-18 14:07:43] Result of "ip a show enp1s0 | grep inet6 | grep global" at vultrnj2:     inet6 2001:19f0:5:66c1:5400:4ff:fe3f:1dc3/64 scope global dynamic mngtmpaddr noprefixroute 
+
+[UTC 2022-12-18 14:07:43] Result of "ip a show enp1s0 | grep inet6 | grep global" at vultrchicago:     inet6 2001:19f0:5c01:cae:5400:4ff:fe3f:1da0/64 scope global dynamic mngtmpaddr noprefixroute 
+
+[UTC 2022-12-18 14:07:43] Result of "ip a show enp1s0 | grep inet6 | grep global" at vultrmiami:     inet6 2001:19f0:9002:2c8e:5400:4ff:fe3f:1dcc/64 scope global dynamic mngtmpaddr noprefixroute 
+
+[UTC 2022-12-18 14:07:43] Result of "ip a show enp1s0 | grep inet6 | grep global" at vultrmexicocity:     inet6 2001:19f0:b400:1ec0:5400:4ff:fe3f:1da1/64 scope global dynamic mngtmpaddr noprefixroute 
+
+[UTC 2022-12-18 14:07:43] Result of "ip a show enp1s0 | grep inet6 | grep global" at vultrdallas:     inet6 2001:19f0:6402:8d9:5400:4ff:fe3f:1dcb/64 scope global dynamic mngtmpaddr noprefixroute 
+
+[UTC 2022-12-18 14:07:43] Result of "ip a show enp1s0 | grep inet6 | grep global" at vultramsterdam:     inet6 2a05:f480:1400:112:5400:4ff:fe3f:1d9c/64 scope global dynamic mngtmpaddr noprefixroute 
+
+[UTC 2022-12-18 14:07:43] Result of "ip a show enp1s0 | grep inet6 | grep global" at vultrla:     inet6 2001:19f0:6001:4222:5400:4ff:fe3f:1da2/64 scope global dynamic mngtmpaddr noprefixroute 
+
+[UTC 2022-12-18 14:07:43] Result of "ip a show enp1s0 | grep inet6 | grep global" at vultrlondon:     inet6 2a05:f480:1000:14c:5400:4ff:fe3f:1dc5/64 scope global dynamic mngtmpaddr noprefixroute 
+
+[UTC 2022-12-18 14:07:43] Result of "ip a show enp1s0 | grep inet6 | grep global" at vultrmadrid:     inet6 2a05:f480:2800:1b53:5400:4ff:fe3f:1dc8/64 scope global dynamic mngtmpaddr noprefixroute 
+
+[UTC 2022-12-18 14:07:43] Result of "ip a show enp1s0 | grep inet6 | grep global" at vultrstockholm:     inet6 2a05:f480:2000:2cea:5400:4ff:fe3f:1dc2/64 scope global dynamic mngtmpaddr noprefixroute 
+
+[UTC 2022-12-18 14:07:43] Result of "ip a show enp1s0 | grep inet6 | grep global" at vultrsiliconvalley:     inet6 2001:19f0:ac02:c6c:5400:4ff:fe3f:1dd7/64 scope global dynamic mngtmpaddr noprefixroute 
+
+[UTC 2022-12-18 14:07:43] Result of "ip a show enp1s0 | grep inet6 | grep global" at vultrwarsaw:     inet6 2a05:f480:2400:1aee:5400:4ff:fe3f:1d9a/64 scope global dynamic mngtmpaddr noprefixroute 
+
+[UTC 2022-12-18 14:07:43] Result of "ip a show enp1s0 | grep inet6 | grep global" at vultrparis:     inet6 2001:19f0:6801:12e0:5400:4ff:fe3f:1dc4/64 scope global dynamic mngtmpaddr noprefixroute 
+
+[UTC 2022-12-18 14:07:43] Result of "ip a show enp1s0 | grep inet6 | grep global" at vultrseattle:     inet6 2001:19f0:8001:5d5:5400:4ff:fe3f:1dcd/64 scope global dynamic mngtmpaddr noprefixroute 
+
+[UTC 2022-12-18 14:07:43] Result of "ip a show enp1s0 | grep inet6 | grep global" at vultrfrankfurt:     inet6 2001:19f0:6c01:17b5:5400:4ff:fe3f:1dd6/64 scope global dynamic mngtmpaddr noprefixroute 
+
+[UTC 2022-12-18 14:07:43] Result of "ip a show enp1s0 | grep inet6 | grep global" at vultrsaopaulo:     inet6 2001:19f0:b800:1297:5400:4ff:fe3f:1dd4/64 scope global dynamic mngtmpaddr noprefixroute 
+
+[UTC 2022-12-18 14:07:43] Result of "ip a show enp1s0 | grep inet6 | grep global" at vultrseoul:     inet6 2401:c080:1c01:554:5400:4ff:fe3f:1dc6/64 scope global dynamic mngtmpaddr noprefixroute 
+
+[UTC 2022-12-18 14:07:43] Result of "ip a show enp1s0 | grep inet6 | grep global" at vultrmelbourne:     inet6 2401:c080:2000:16cb:5400:4ff:fe3f:1dc9/64 scope global dynamic mngtmpaddr noprefixroute 
+
+[UTC 2022-12-18 14:07:43] Result of "ip a show enp1s0 | grep inet6 | grep global" at vultrsydney:     inet6 2401:c080:1800:4f72:5400:4ff:fe3f:1dd5/64 scope global dynamic mngtmpaddr noprefixroute 
+
+[UTC 2022-12-18 14:07:43] Result of "ip a show enp1s0 | grep inet6 | grep global" at vultrsingapore:     inet6 2401:c080:1400:4b7b:5400:4ff:fe3f:1d9b/64 scope global dynamic mngtmpaddr noprefixroute 
+
+[UTC 2022-12-18 14:07:43] Result of "ip a show enp1s0 | grep inet6 | grep global" at vultrmumbai:     inet6 2401:c080:2400:1c6e:5400:4ff:fe3f:1d9f/64 scope global dynamic mngtmpaddr noprefixroute 
+
+[UTC 2022-12-18 14:07:43] Result of "ip a show enp1s0 | grep inet6 | grep global" at vultrtokyo:     inet6 2001:19f0:7001:4282:5400:4ff:fe3f:1d9d/64 scope global dynamic mngtmpaddr noprefixroute 
+

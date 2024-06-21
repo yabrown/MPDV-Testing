@@ -1,0 +1,19 @@
+{
+  "configurations": [
+    {
+      "type": "aws-sam",
+      "request": "direct-invoke",
+      "name": "real-world-mpdv-testing:bgp-hijack.cert_request_and_log (python3.7)",
+      "invokeTarget": {
+        "target": "code",
+        "projectRoot": "${workspaceFolder}/",
+        "lambdaHandler": "bgp-hijack.cert_request_and_log"
+      },
+      "lambda": {
+        "runtime": "python3.7",
+        "payload": {},
+        "environmentVariables": {}
+      }
+    }
+  ]
+}
