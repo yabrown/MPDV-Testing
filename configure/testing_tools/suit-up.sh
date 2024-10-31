@@ -39,12 +39,6 @@ systemctl restart apparmor
 named-checkconf /etc/bind/named.conf  #test it works
 rndc reconfig
 
-# Move logging scripts into place
-if [ -d ~/mpdv_logging ]; then
-  rm -r ~/mpdv_logging
-fi
-cp -r mpdv_logging ~/
-
 # Start apache, now that you updated /var/www/html/
 service apache2 restart
 

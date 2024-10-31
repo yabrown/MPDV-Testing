@@ -2,6 +2,33 @@ import subprocess
 import json
 import os
 
+def run_terraform_command(command):
+    """
+    Run a Terraform command with the given options.
+
+    :param command: The Terraform command to run.
+    :param options: A dictionary of options to pass to the command.
+    :return: The output of the command.
+    """
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    cmd = [
+        'terraform',
+        f'-chdir={script_dir}/terraform',
+        command,
+        f'-var=machines_to_run={machines_to_run}',
+    ]
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    if result.returncode != 0:
+        raise Exception(f"Error running Terraform {command}: {result.stderr}")
+    return result.stdout
+
+def plan_terraform():
+    return run_terraform_command('plan')
+
+def apply_terraform(options):
+    return run_terraform_command('apply')
+
+
 def apply_terraform_with_variable(machines_to_run):
     """
     Apply Terraform configurations with the given machine names.
@@ -12,49 +39,130 @@ def apply_terraform_with_variable(machines_to_run):
     machine_json = json.dumps(machines_to_run)
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    # Construct the Terraform command
-    cmd = [
-        'terraform', f'-chdir={script_dir}/terraform', 'apply', # specifies where config file is found
-        '-auto-approve',  # Skip interactive approval; use cautiously!
-        f'-var=machines_to_run={machine_json}',
-        
-    ]
-    print(cmd)
-    # Run the command and capture the output
-    result = subprocess.run(cmd, capture_output=True, text=True)
 
-    # Check for errors and print the output
-    if result.returncode != 0:
-        print("Error running terraform:", result.stderr)
+    #First, plan the changes and confirm user approval
+    plan_cmd = [
+        'terraform', f'-chdir={script_dir}/terraform', 'plan', # specifies where config file is found
+        f'-var=machines_to_run={machine_json}',
+    ]
+    
+    print("Running Terraform plan...")
+    plan_result = subprocess.run(plan_cmd, capture_output=True, text=True)
+    print(plan_result.stdout)
+    
+    response = input("Do you want to proceed with Terraform apply? (yes/no): ")
+    
+    if response.lower() == "yes":
+        apply_cmd = [
+            'terraform', f'-chdir={script_dir}/terraform', 'apply', # specifies where config file is found
+            '-auto-approve',  # Skip interactive approval; use cautiously!
+            f'-var=machines_to_run={machine_json}',
+        ]
+        print("Running Terraform apply...")
+        
+        # Print in real time 
+        with subprocess.Popen(apply_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) as process:
+            # Continuously read output from stdout line by line
+            for line in process.stdout:
+                print(line, end='')  # Print each line as it is outputted
+            # Optionally, handle stderr if needed
+            stderr_output = process.stderr.read()
+            if stderr_output:
+                print(stderr_output, end='')  # Print any error output
+
+        # Check for errors and print the output
+        if process.wait() != 0:
+            print("terraform apply has failed, exiting...")
+            exit()
+        else:
+            # Generate config.json file
+            output = subprocess.check_output(["terraform", f"-chdir={script_dir}/terraform", "output", "-json"])
+            output_dict = json.loads(output)
+            nodes = output_dict["node_ips"]["value"]
+            with open("configure/config.json", "w") as file:
+                json.dump({"nodes": nodes}, file, indent=4)
+            print("Generated config.json file")
     else:
-        print(result.stdout)
+        print("Terraform apply cancelled.")
+        exit()
+
+
 
 if __name__ == "__main__":
-    # This creates all instances except Johannesburg and Sao Paolo
+    # This creates all instances except Honolulu and Sao Paolo (they don't use the same plan as the rest, must be spun up separately)
     # because they use different plans
-    machines_to_run = {"ariatlanta":"atl", 
-                       "ariamsterdam":"ams", 
-                       "arichicago":"ord",
-                       "aridallas": "dfw",
-                       "arifrance": "fra",
-                       "arilondon":"lhr",
-                       "arimadrid":"mad",
-                       "arimelbourne":"mel",
-                       "arimexicocity": "mex",
-                       "arimiami": "mia",
-                       "arimumbai":"bom",
-                       "aribangalore":"blr",
-                       "ariparis":"cdg",
-                       "ariseattle": "sea",
-                       "ariseoul":"icn",
-                       "arisiliconvalley":"sjc",
-                       "arisingapore":"sgp",
-                       "aristockholm":"sto",
-                       "arisidney":"syd",
-                       "aritokyo":"nrt",
-                       "aritoronto":"yto",
-                       "arila":"lax",
-                       "ariwarsaw":"waw",
-                       "arinj2":"ewr",
-                       }
-    apply_terraform_with_variable(machines_to_run)
+    all_options = {
+        "main": "ams",
+        "ariamsterdam": "ams",
+        "ariatlanta": "atl",
+        "aribangalore": "blr",
+        "arimumbai": "bom",
+        "ariparis": "cdg",
+        "aridelhincr": "del",
+        "aridallas": "dfw",
+        "arinewjersey": "ewr",
+        "arifrankfurt": "fra",
+        "ariseoul": "icn",
+        "ariosaka": "itm",
+        "arijohannesburg": "jnb",
+        "arilosangeles": "lax",
+        "arilondon": "lhr",
+        "arimadrid": "mad",
+        "arimanchester": "man",
+        "arimelbourne": "mel",
+        "arimexicocity": "mex",
+        "arimiami": "mia",
+        "aritokyo": "nrt",
+        "arichicago": "ord",
+        "arisantiago": "scl",
+        "ariseattle": "sea",
+        "arisingapore": "sgp",
+        "arisiliconvalley": "sjc",
+        "aristockholm": "sto",
+        "arisydney": "syd",
+        "aritelaviv": "tlv",
+        "ariwarsaw": "waw",
+        "aritoronto": "yto",
+        "arisaopaulo": "sao",
+        "arihonolulu": "hnl"
+}
+                       
+    machines_to_run = {
+        "ariamsterdam": "ams",
+        "ariatlanta": "atl",
+        "aribangalore": "blr",
+        #"arimumbai": "bom",
+        #"ariparis": "cdg",
+        #"aridelhincr": "del",
+        "aridallas": "dfw",
+        "arinewjersey": "ewr",
+        #"arifrankfurt": "fra",
+        #"ariseoul": "icn",
+        "ariosaka": "itm",
+        "arijohannesburg": "jnb",
+        "arilosangeles": "lax",
+        "arilondon": "lhr",
+        "arimadrid": "mad",
+        "arimanchester": "man",
+        #"arimelbourne": "mel",
+        "arimexicocity": "mex",
+        "arimiami": "mia",
+        #"aritokyo": "nrt",
+        "arichicago": "ord",
+        "arisantiago": "scl",
+        "ariseattle": "sea",
+        "arisingapore": "sgp",
+        "arisiliconvalley": "sjc",
+        "aristockholm": "sto",
+        "arisydney": "syd",
+        "aritelaviv": "tlv",
+        "ariwarsaw": "waw",
+        "aritoronto": "yto"
+        }
+    test = {
+        "main": "ams",
+        "ariamsterdam": "ams",
+        "ariatlanta": "atl",
+        "arilosangeles": "lax",
+        }
+    apply_terraform_with_variable(all_options)

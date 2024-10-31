@@ -7,6 +7,8 @@ import textwrap
 import random
 import datetime
 import subprocess
+import requests
+import json
 from bgp_pathfinder.pathfinder import main as pathfinder
 from bgp_pathfinder.send_cmd import main as send_cmd
 from bgp_pathfinder.engines.vultr import copy_file_from_node_name as copy_file
@@ -38,16 +40,15 @@ def cert_request_and_log(cert_name, cert_req_cmd, node_a, node_b):
 
   # runs cert specific cert-req-cmd at main [1]
   print(cert_req_cmd)
-  send_cmd([cert_req_cmd, "-d", "main"])
-  #time.sleep(10)
+  send_cmd([cert_req_cmd, "-d", "main"])  #this will only return once the cert_req is done, so you know all DV requests arrived
 
   # create and compose log files in both nodes
   send_cmd([compose_log(a_filename), "-d", node_a]) # run at A, name a-b
   send_cmd([compose_log(b_filename), "-d", node_b]) # run at B, name b-a
 
   # copy files over locally from both nodes
-  copy_file(a_filename, node_a, "./logs")
-  copy_file(b_filename, node_b, "./logs")
+  copy_file(a_filename, node_a, "./results/logs")
+  copy_file(b_filename, node_b, "./results/logs")
 
 def attack(node_a, node_b):
   args = ["-d", node_a,  node_b, "-i", "66.180.191.0/24"]
@@ -58,26 +59,38 @@ def attack(node_a, node_b):
   time.sleep(300)
   
   start = time.time()
-  for i in range(5):
-    rand = random.randint(0, 100_000_000)
-    cf_name, cf_req_cmd = f"cf-{i}",  f'curl -X POST -d \'{{"method":"acme/http-01","kaHash":"TfPD9o_Mg7J-nULJBDGnJJnxeHXIGlmbVmyYiblpZwM=","token":"aaaaaaaaaaaaaaaaaaaaa", "domain":"{rand}.arins.pretend-crypto-wallet.com","accessToken":"YTrWJscsDU2BJNF_AUaXjg=="}}\' https://dcvcheck.cloudflare.com/mpdcv/v1'
-    cert_request_and_log(cf_name, cf_req_cmd, node_a, node_b)
-  for i in range(5):
-    rand = random.randint(0, 100_000_000)
-    gg_name, gg_req_cmd = f"gg-{i}", f"certbot certonly --domains {rand}.arins.pretend-crypto-wallet.com --server https://dv.acme-v02.test-api.pki.goog/directory --force-renew --apache"
-    cert_request_and_log(gg_name, gg_req_cmd, node_a, node_b)
   rand = random.randint(0, 100_000_000)
-  le_name, le_req_cmd = "le", f"certbot certonly --manual --manual-auth-hook \"bash -c 'exit 1'\" -d {rand}.arins.pretend-crypto-wallet.com --server https://acme-staging-v02.api.letsencrypt.org/directory --non-interactive --agree-tos --email ari.l.braun@gmail.com"
-  cert_request_and_log(le_name, le_req_cmd, node_a, node_b)
+  gg_prem_name, gg_prem_req = "ggp", 'time curl -X POST http://34.75.246.52:5000/run-all -H "Content-Type: application/json" -d \'{"domain": "123123123.arins.pretend-crypto-wallet.com", "token": "hijacks_are_bad"}\''
+  cert_request_and_log(gg_prem_name, gg_prem_req, node_a, node_b)
+  gg_free_name, gg_free_req = "ggf", 'time curl -X POST  http://35.211.239.179:5000/run-all -H "Content-Type: application/json" -d \'{"domain": "123123123.arins.pretend-crypto-wallet.com", "token": "hijacks_are_bad"}\''
+  cert_request_and_log(gg_free_name, gg_free_req, node_a, node_b)
+  open_mpic_args = {
+    "orchestration_parameters": {
+      "perspective_count": 13,
+      "max_attempts": 1
+    },
+    "check_type": "dcv",
+    "domain_or_ip_target": "123233.arins.pretend-crypto-wallet.com",
+    "dcv_check_parameters": {
+      "validation_method": "http-generic",
+      "validation_details": {
+        "http_token_path": "/bgp_hijacks_are_bad",
+        "challenge_value": "test"
+      }
+    }
+  }
+  open_mpic_name, open_mpic_req = "om", f'time curl -X POST https://anor3x6mtj.execute-api.us-east-2.amazonaws.com/v1/mpic -H "Content-Type: application/json" -H "x-api-key: {os.getenv("MPIC_API_KEY")}" -d \'{json.dumps(open_mpic_args)}\''
+  cert_request_and_log(open_mpic_name, open_mpic_req, node_a, node_b)
+
   end = time.time()
-  print("Total MPDV time= ", end-start)
+  print("Total time for all attacks between this pair of nodes= ", end-start)
 
 
  
 if __name__ == "__main__":
   script_dir = os.path.dirname(os.path.abspath(__file__))
 
-  # check arguments
+  # check correct number of arguments
   if len(sys.argv)==1: 
     print("Please add arguments.")
     exit()

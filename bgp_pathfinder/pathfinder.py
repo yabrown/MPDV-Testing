@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import traceback
 import os
 import sys
 import argparse
@@ -9,7 +10,7 @@ import importlib
 import time
 import datetime
 import threading
-import bgp_utils
+from . import bgp_utils
 
 def get_current_human_time():
 	value = datetime.datetime.fromtimestamp(time.time())
@@ -230,7 +231,15 @@ def main(raw_args=None):
 			t.start()
 			threads.append(t)
 		for t in threads:
-			t.join()
+			t.join(timeout=300)
+			if t.is_alive():
+				print(f"Thread {t.name} is hung. Inspecting call stack:")
+				for thread_id, frame in sys._current_frames().items():
+					if thread_id == t.ident:
+						print(f"\nCall stack for thread {t.name} (ID: {thread_id}):")
+						traceback.print_stack(frame)
+				raise Exception("Thread hung")
+		
 		return
 	if args.setup_from_announcement_statement is not None:
 		bgp_utils.make_announcements_from_announcement_statement(engine, masterConfig, args.setup_from_announcement_statement)

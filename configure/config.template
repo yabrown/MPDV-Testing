@@ -1,0 +1,13 @@
+{
+    "nodes": {
+        "YOUR_NODE_NAME": "YOUR_NODE_IP_ADDRESS",
+        "YOUR_NODE_NAME_2": "YOUR_NODE_IP_ADDRESS_2",
+    }
+    "certificate_authorities": [
+        {
+            "name": "YOUR_CA_NAME",
+            "endpoint": "YOUR_CA_ENDPOINT",
+            "arguments": "YOUR_REQUEST_ARGUMENTS"
+        }
+    ]
+}

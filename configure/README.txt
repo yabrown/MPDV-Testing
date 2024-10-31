@@ -7,7 +7,7 @@ update-pathfinder-config-- python script that uses nodes.json to update the conf
 
 nodes.json-- used to update config pathfinder files. This should contain all information that affects the state of the network, such as ip's, names, and address blocks we can announce.
 
-testing-tools-- contains all files and directories that need to be on a node in order to run and and record data for an attack. Should contain all changes to a given node, any file that is added or manipulated must be represented here. 
+testing-tools-- contains all files and directories that need to be on a node in order to run and and record data for a single BGP attack. Should contain all changes to a given node, any file that is added or manipulated must be represented here. 
 
 config.sh-- runs the full configuration of a node. After this is called, all attacks and measurement should be possible with simple commands. 
 

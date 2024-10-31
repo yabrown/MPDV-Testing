@@ -11,22 +11,23 @@ terraform {
 provider "vultr" {
   rate_limit  = 700
   retry_limit = 3
-  api_key = ""
+  api_key = var.vultr_api_key
 }
 
+# this variable is just a mapping of machine names to region id's (ams, atl, etc)
 variable "machines_to_run" {
   description = "Map of (machine_name->region) to be provisioned"
   type        = map(string)
   default     = {}  # You can specify a default value if needed
 }
 
-# generic instance
+# this generic instance includes a for_each, so it's applied in a loop
 resource "vultr_instance" "instance" {
   for_each         = var.machines_to_run
   plan             = "vc2-2c-4gb"
   region           = each.value
   os_id            = 1743
-  ssh_key_ids      = ["7dac9cd6-3c0e-482c-915f-83ade3d840d4"]
+  ssh_key_ids      = ["b1062298-c96c-496c-90f8-ce21aaf97417"]
   backups          = "disabled"
   label            = each.key
   hostname         = each.key
@@ -34,7 +35,10 @@ resource "vultr_instance" "instance" {
   ddos_protection  = false
   activation_email = false
 }
-
+output "node_ips" {
+  value = { for instance in vultr_instance.instance : instance.hostname => instance.main_ip }
+}
+/*
 //These two aren't available with usual plan
 resource "vultr_instance" "vultrsaopaulo" {
   plan             = "vc2-1c-2gb-sc1"
@@ -63,8 +67,6 @@ resource "vultr_instance" "vultrjohannesburg" {
   activation_email = false
 }
 
-
-/*
 # Create an instance
 resource "vultr_instance" "vultramsterdam" {
   plan             = "vc2-2c-4gb"

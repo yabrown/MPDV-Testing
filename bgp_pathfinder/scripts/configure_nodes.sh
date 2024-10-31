@@ -3,8 +3,8 @@
 
 
 
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-cd $SCRIPT_DIR/..
+SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+cd "$SCRIPT_DIR/.."
 
 
 ./send_cmd.py "echo 'net.ipv4.ip_forward=1' >> /etc/sysctl.conf"
