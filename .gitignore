@@ -169,3 +169,7 @@ scrap.txt
 results/logs/*
 results/state.json
 thoughts.md
+screenlog.watchdog
+config.json
+watchdog.py
+configure/config.json

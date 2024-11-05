@@ -8,10 +8,7 @@ import threading
 import sys
 import traceback
 
-# Watchdog ensures threads that hang for too long raise an exception
-def thread_watchdog(timeout=300, interval=300):
-    start_times = {thread.ident: time.time() for thread in threading.enumerate()}
-    
+
 def load_nodes_from_config():
   try:
     with open('configure/config.json', 'r') as file:

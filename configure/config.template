@@ -1,8 +1,14 @@
 {
     "nodes": {
         "YOUR_NODE_NAME": "YOUR_NODE_IP_ADDRESS",
-        "YOUR_NODE_NAME_2": "YOUR_NODE_IP_ADDRESS_2",
-    }
+        "YOUR_NODE_NAME_2": "YOUR_NODE_IP_ADDRESS_2"
+    },
+    "vultr_regions": {
+        "YOUR_NODE_NAME": "YOUR_NODE_REGION",
+        "YOUR_NODE_NAME_2": "YOUR_NODE_REGION_2"
+    },
+    "vultr_api_key": "YRVVONN44IQY7ODUHGGSB4UVEZZ43LGW6Y3Q",
+    "open_mpic_api_key": "YOUR_OPEN_MPIC_API_KEY",
     "certificate_authorities": [
         {
             "name": "YOUR_CA_NAME",

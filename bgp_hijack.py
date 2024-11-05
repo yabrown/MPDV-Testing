@@ -79,7 +79,9 @@ def attack(node_a, node_b):
       }
     }
   }
-  open_mpic_name, open_mpic_req = "om", f'time curl -X POST https://anor3x6mtj.execute-api.us-east-2.amazonaws.com/v1/mpic -H "Content-Type: application/json" -H "x-api-key: {os.getenv("MPIC_API_KEY")}" -d \'{json.dumps(open_mpic_args)}\''
+  with open("configure/config.json", "r") as file:
+    open_mpic_api_key = json.load(file)["MPIC_API_KEY"]
+  open_mpic_name, open_mpic_req = "om", f'time curl -X POST https://anor3x6mtj.execute-api.us-east-2.amazonaws.com/v1/mpic -H "Content-Type: application/json" -H "x-api-key: {open_mpic_api_key}" -d \'{json.dumps(open_mpic_args)}\''
   cert_request_and_log(open_mpic_name, open_mpic_req, node_a, node_b)
 
   end = time.time()

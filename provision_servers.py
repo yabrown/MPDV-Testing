@@ -29,7 +29,7 @@ def apply_terraform(options):
     return run_terraform_command('apply')
 
 
-def apply_terraform_with_variable(machines_to_run):
+def apply_terraform_with_variable(machines_to_run, vultr_api_key):
     """
     Apply Terraform configurations with the given machine names.
 
@@ -44,6 +44,7 @@ def apply_terraform_with_variable(machines_to_run):
     plan_cmd = [
         'terraform', f'-chdir={script_dir}/terraform', 'plan', # specifies where config file is found
         f'-var=machines_to_run={machine_json}',
+        f'-var=vultr_api_key={vultr_api_key}',
     ]
     
     print("Running Terraform plan...")
@@ -57,6 +58,7 @@ def apply_terraform_with_variable(machines_to_run):
             'terraform', f'-chdir={script_dir}/terraform', 'apply', # specifies where config file is found
             '-auto-approve',  # Skip interactive approval; use cautiously!
             f'-var=machines_to_run={machine_json}',
+            f'-var=vultr_api_key={vultr_api_key}',
         ]
         print("Running Terraform apply...")
         
@@ -79,8 +81,11 @@ def apply_terraform_with_variable(machines_to_run):
             output = subprocess.check_output(["terraform", f"-chdir={script_dir}/terraform", "output", "-json"])
             output_dict = json.loads(output)
             nodes = output_dict["node_ips"]["value"]
+            with open("configure/config.json", "r") as file:
+                config = json.load(file)
+            config["nodes"] = nodes
             with open("configure/config.json", "w") as file:
-                json.dump({"nodes": nodes}, file, indent=4)
+                json.dump(config, file, indent=4)
             print("Generated config.json file")
     else:
         print("Terraform apply cancelled.")
@@ -91,78 +96,8 @@ def apply_terraform_with_variable(machines_to_run):
 if __name__ == "__main__":
     # This creates all instances except Honolulu and Sao Paolo (they don't use the same plan as the rest, must be spun up separately)
     # because they use different plans
-    all_options = {
-        "main": "ams",
-        "ariamsterdam": "ams",
-        "ariatlanta": "atl",
-        "aribangalore": "blr",
-        "arimumbai": "bom",
-        "ariparis": "cdg",
-        "aridelhincr": "del",
-        "aridallas": "dfw",
-        "arinewjersey": "ewr",
-        "arifrankfurt": "fra",
-        "ariseoul": "icn",
-        "ariosaka": "itm",
-        "arijohannesburg": "jnb",
-        "arilosangeles": "lax",
-        "arilondon": "lhr",
-        "arimadrid": "mad",
-        "arimanchester": "man",
-        "arimelbourne": "mel",
-        "arimexicocity": "mex",
-        "arimiami": "mia",
-        "aritokyo": "nrt",
-        "arichicago": "ord",
-        "arisantiago": "scl",
-        "ariseattle": "sea",
-        "arisingapore": "sgp",
-        "arisiliconvalley": "sjc",
-        "aristockholm": "sto",
-        "arisydney": "syd",
-        "aritelaviv": "tlv",
-        "ariwarsaw": "waw",
-        "aritoronto": "yto",
-        "arisaopaulo": "sao",
-        "arihonolulu": "hnl"
-}
-                       
-    machines_to_run = {
-        "ariamsterdam": "ams",
-        "ariatlanta": "atl",
-        "aribangalore": "blr",
-        #"arimumbai": "bom",
-        #"ariparis": "cdg",
-        #"aridelhincr": "del",
-        "aridallas": "dfw",
-        "arinewjersey": "ewr",
-        #"arifrankfurt": "fra",
-        #"ariseoul": "icn",
-        "ariosaka": "itm",
-        "arijohannesburg": "jnb",
-        "arilosangeles": "lax",
-        "arilondon": "lhr",
-        "arimadrid": "mad",
-        "arimanchester": "man",
-        #"arimelbourne": "mel",
-        "arimexicocity": "mex",
-        "arimiami": "mia",
-        #"aritokyo": "nrt",
-        "arichicago": "ord",
-        "arisantiago": "scl",
-        "ariseattle": "sea",
-        "arisingapore": "sgp",
-        "arisiliconvalley": "sjc",
-        "aristockholm": "sto",
-        "arisydney": "syd",
-        "aritelaviv": "tlv",
-        "ariwarsaw": "waw",
-        "aritoronto": "yto"
-        }
-    test = {
-        "main": "ams",
-        "ariamsterdam": "ams",
-        "ariatlanta": "atl",
-        "arilosangeles": "lax",
-        }
-    apply_terraform_with_variable(all_options)
+    with open("configure/config.json", "r") as file:
+        config = json.load(file)
+        name_region_dict = config["vultr_regions"]
+        vultr_api_key = config["vultr_api_key"]
+    apply_terraform_with_variable(name_region_dict, vultr_api_key)

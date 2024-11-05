@@ -22,8 +22,10 @@ Before running the code, you need to provide specific configuration details. Fol
    - **Automatic Server Creation (Optional)**:
      - If you want the code to create servers for you using Vultr, provide the following in `config.json`:
        - Vultr API Key
-       - A set of Vultr regions (to specify server locations)
-       - Vultr SSH key ID and the corresponding private key
+       - A set of node names mapped to Vultr regions (to specify server locations)
+       - Vultr SSH key ID
+     - Finally, put the private key corresponding with the above SSH key ID in bgp_pathfinder/key/vultr/vultr.pem (this will be used to run commands on your nodes)
+
 
    - Once the servers are created, their details will automatically be added to `config.json`.
 
