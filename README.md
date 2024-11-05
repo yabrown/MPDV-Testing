@@ -18,16 +18,17 @@ Before running the code, you need to provide specific configuration details. Fol
    - Edit `config.json` with the following information:
 
 2. **Configure Server Details**:
-   - **Existing Servers**: Add a list of server IP addresses to the `servers` section in `config.json`.
+   - **Existing Servers**: Add a list of server names and IP addresses to the `nodes` section in `config.json`.
    - **Automatic Server Creation (Optional)**:
      - If you want the code to create servers for you using Vultr, provide the following in `config.json`:
        - Vultr API Key
        - A set of node names mapped to Vultr regions (to specify server locations)
        - Vultr SSH key ID
-     - Finally, put the private key corresponding with the above SSH key ID in bgp_pathfinder/key/vultr/vultr.pem (this will be used to run commands on your nodes)
+      - Once the servers are created, their details will automatically be added to `config.json`.
+   - Finally, put the private key corresponding with the above SSH key ID in bgp_pathfinder/key/vultr/vultr.pem (this will be used to run commands on your nodes)
 
 
-   - Once the servers are created, their details will automatically be added to `config.json`.
+   
 
 3. **Configure Certificate Authority Details**:
    - Specify each Certificate Authority’s:

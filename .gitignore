@@ -161,7 +161,7 @@ cython_debug/
 
 #sensitive info
 terraform/variables.tf
-terraform/terraform.tfstate*
+terraform/terraform.tfstate
 
 # unimportant
 screenlog.0
