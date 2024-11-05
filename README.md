@@ -25,7 +25,7 @@ Before running the code, you need to provide specific configuration details. Fol
        - A set of node names mapped to Vultr regions (to specify server locations)
        - Vultr SSH key ID
       - Once the servers are created, their details will automatically be added to `config.json`.
-   - Finally, put the private key corresponding with the above SSH key ID in bgp_pathfinder/key/vultr/vultr.pem (this will be used to run commands on your nodes)
+   - Finally, put the servers' private SSH key--they should all be the same--in bgp_pathfinder/key/vultr/vultr.pem (this will be used to run commands on your nodes)
 
 
    
