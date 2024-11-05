@@ -22,7 +22,13 @@ def run_cmd(cmdAndArgsList):
 	err = b''
 	for i in range(retryCount):
 		p = subprocess.Popen(cmdAndArgsList, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-		out, err = p.communicate()
+		try:
+			out, err = p.communicate(timeout=500)
+		except subprocess.TimeoutExpired:
+			print(f"[{get_current_human_time()}] Timeout expired for cmd {cmdAndArgsList}")
+			p.kill()  # kill the subprocess
+			continue
+        
 		if err == b'':
 			return out.decode('utf-8')
 		elif "kex_exchange_identification" in err.decode('utf-8'): # Just try again in this case.
