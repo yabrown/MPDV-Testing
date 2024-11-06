@@ -66,7 +66,9 @@ def cert_request_and_log(cert_name, cert_req_dict, node_a, node_b):
           print(f"Attempt {attempt + 1} failed with status code {response.status_code}. Waiting 10 seconds and retrying...")
           time.sleep(10)
       else:
-          raise Exception(f"Failed after {retries} attempts with status code {response.status_code}.")
+          # log error
+          with open(f"{dir_path}/results/errors.log", 'a') as file:
+            file.write(f"{node_a},{node_b}:\tHTTP Error: Failed after {retries} attempts with final status code {response.status_code}")
 
   # create and compose log files in both nodes
   send_cmd([compose_log(a_filename), "-d", node_a]) # run at A, name a-b
