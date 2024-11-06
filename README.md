@@ -25,7 +25,8 @@ Ensure you have Terraform downloaded onto your computer. Before running the code
        - A set of node names mapped to Vultr regions (to specify server locations)
        - Vultr SSH key ID
       - Once the servers are created, their details will automatically be added to `config.json`.
-   - Finally, put the servers' private SSH key--they should all be the same--in bgp_pathfinder/key/vultr/vultr.pem (this will be used to run commands on your nodes)
+   - Finally, put the servers' private SSH key--they should all be the same--in bgp_pathfinder/key/vultr/vultr.pem AND set the permisson for file to 700(this will be used to run commands on your nodes)
+   - Then, create results/state.json initialized to {"mid_test": false, "": "ariatlanta", "curr_node_b": ""}, along with results/summary.log and restults/http.log and make sure results/logs is a directory
 
 
    

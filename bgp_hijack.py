@@ -63,7 +63,8 @@ def cert_request_and_log(cert_name, cert_req_dict, node_a, node_b):
       if response.status_code == 200:
           break
       elif attempt < retries - 1:
-          print(f"Attempt {attempt + 1} failed with status code {response.status_code}. Retrying...")
+          print(f"Attempt {attempt + 1} failed with status code {response.status_code}. Waiting 10 seconds and retrying...")
+          time.sleep(10)
       else:
           raise Exception(f"Failed after {retries} attempts with status code {response.status_code}.")
 
