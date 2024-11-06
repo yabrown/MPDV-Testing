@@ -45,3 +45,6 @@ python all_attacks.py
 
 
 Note: This attack simulation can be time-consuming, depending on the number of nodes configured. The attack duration scales with the number of pairwise combinations of nodes, with each attack taking approximately 5–7 minutes.
+
+Debugging:
+-Make sure results/statefile.json has mid_test set to false if you want to start from the beginning. If you want to start from the middle, make sure node_a and node_b are set correctly.
