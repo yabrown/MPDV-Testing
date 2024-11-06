@@ -86,7 +86,7 @@ def cert_request_and_log(cert_name, cert_req_dict, node_a, node_b):
 
   #log the relevant information
   with open(f"{dir_path}/results/summary.log", 'a') as file:
-    formatted_line = f"{node_a} {node_b}:\t{len(node_a_ips)}, {len(node_b_ips)}\tTotal: {len(node_a_ips)+len(node_b_ips)}\n"
+    formatted_line = f"{now}\tUrl{cert_req_dict["url"]}\tPair: {node_a}, {node_b}:\t\t{len(node_a_ips)}, {len(node_b_ips)}\tTotal: {len(node_a_ips)+len(node_b_ips)}\n"
     file.write(formatted_line)
 
 
