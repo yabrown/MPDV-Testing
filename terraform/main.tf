@@ -20,6 +20,12 @@ variable "machines_to_run" {
   type        = map(string)
   default     = {}  # You can specify a default value if needed
 }
+variable "vultr_api_key" {
+  description = "Vultr API Key"
+  type        = string
+  sensitive   = true
+  default =     ""
+}
 
 # this generic instance includes a for_each, so it's applied in a loop
 resource "vultr_instance" "instance" {

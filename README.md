@@ -8,7 +8,7 @@ This codebase tests the resilience of a Certificate Authority (CA) implementatio
 
 ### Configuration Setup
 
-Before running the code, you need to provide specific configuration details. Follow these steps:
+Ensure you have Terraform downloaded onto your computer. Before running the code, you need to provide specific configuration details. Follow these steps:
 
 1. **Create a Config File**:
    - Copy `config.template` to `config.json`:
