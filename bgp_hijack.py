@@ -26,6 +26,29 @@ def ips_from_file(filename, token):
         ips.append(ip)
   return ips
 
+def retry_until_success(clear_logs, cert_req_dict, node_a, node_b):
+  retries = 5
+  for attempt in range(retries):
+      send_cmd([clear_logs, "-d", node_a, node_b])
+      response = requests.post(**cert_req_dict)
+      with open(f"{dir_path}/results/http.log", 'a') as file:
+          now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] + 'Z'
+          if attempt>0: file.write(f"Attempt {attempt}:\n")
+          file.write(f"\t{now} {cert_req_dict}\n")
+          print(f"\t{now} {cert_req_dict}")
+          file.write(f"\t{now} {response.text}\n")
+          print(f"\t{now} {response.text}\n")
+      if response.status_code == 200:
+          break
+      elif attempt < retries - 1:
+          print(f"Attempt {attempt + 1} failed with status code {response.status_code}. Waiting 10 seconds and retrying...")
+          time.sleep(10)
+      else:
+          # log error
+          with open(f"{dir_path}/results/errors.log", 'a') as file:
+            file.write(f"{node_a},{node_b}:\tHTTP Error: Failed after {retries} attempts with final status code {response.status_code}\n")
+
+
 # Function that makes a single cert req and pulls the resulting logs from both nodes
 def cert_request_and_log(cert_name, cert_req_dict, node_a, node_b):
 
@@ -48,27 +71,7 @@ def cert_request_and_log(cert_name, cert_req_dict, node_a, node_b):
     > /var/log/bind/query;
   ''')
 
-  # runs clear_logs script (defined above) at both nodes
-  send_cmd([clear_logs, "-d", node_a, node_b])
-  
-
-  retries = 3
-  for attempt in range(retries):
-      response = requests.post(**cert_req_dict)
-      with open(f"{dir_path}/results/http.log", 'a') as file:
-          now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] + 'Z'
-          if attempt>0: file.write(f"Attempt {attempt}:\n")
-          file.write(f"\t{now} {cert_req_dict}\n")
-          file.write(f"\t{now} {response.text}\n")
-      if response.status_code == 200:
-          break
-      elif attempt < retries - 1:
-          print(f"Attempt {attempt + 1} failed with status code {response.status_code}. Waiting 10 seconds and retrying...")
-          time.sleep(10)
-      else:
-          # log error
-          with open(f"{dir_path}/results/errors.log", 'a') as file:
-            file.write(f"{node_a},{node_b}:\tHTTP Error: Failed after {retries} attempts with final status code {response.status_code}")
+  retry_until_success(clear_logs, cert_req_dict, node_a, node_b)
 
   # create and compose log files in both nodes
   send_cmd([compose_log(a_filename), "-d", node_a]) # run at A, name a-b
@@ -82,11 +85,13 @@ def cert_request_and_log(cert_name, cert_req_dict, node_a, node_b):
   token = "hijacks_are_bad"
   node_a_ips = ips_from_file(f"./results/logs/{a_filename}", token)
   node_b_ips = ips_from_file(f"./results/logs/{b_filename}", token)
+  print(f"Extracted IP's:\n{node_a}:\t{node_a_ips}\n{node_b}:\t{node_b_ips}")
 
 
   #log the relevant information
   with open(f"{dir_path}/results/summary.log", 'a') as file:
-    formatted_line = f'{now}\tUrl{cert_req_dict["url"]}\tPair: {node_a}, {node_b}:\t\t{len(node_a_ips)}, {len(node_b_ips)}\tTotal: {len(node_a_ips)+len(node_b_ips)}\n'
+    now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] + 'Z'
+    formatted_line = f'{now}\tPair: {node_a}, {node_b}:\t\t{len(node_a_ips)}, {len(node_b_ips)}\tTotal: {len(node_a_ips)+len(node_b_ips)}\n'
     file.write(formatted_line)
 
 
@@ -109,7 +114,9 @@ def attack(node_a, node_b):
       },
       "json": {
         "domain": "123123123.arins.pretend-crypto-wallet.com",
-        "token": "hijacks_are_bad"
+        "token": "hijacks_are_bad",
+        "node_a": node_a,
+        "node_b": node_b
       }
   }
   gg_free_name = "ggf"
@@ -120,7 +127,9 @@ def attack(node_a, node_b):
       },
       "json": {
         "domain": "123123123.arins.pretend-crypto-wallet.com",
-        "token": "hijacks_are_bad"
+        "token": "hijacks_are_bad",
+        "node_a": node_a,
+        "node_b": node_b
       }
   }
 

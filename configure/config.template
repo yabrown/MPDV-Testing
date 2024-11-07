@@ -8,7 +8,7 @@
         "YOUR_NODE_NAME_2": "YOUR_NODE_REGION_2"
     },
     "vultr_api_key": "YOUR_VULTR_API_KEY",
-    "open_mpic_api_key": "YOUR_OPEN_MPIC_API_KEY",
+    "mpic_api_key": "YOUR_OPEN_MPIC_API_KEY",
     "certificate_authorities": [
         {
             "name": "YOUR_CA_NAME",
