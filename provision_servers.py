@@ -29,7 +29,7 @@ def apply_terraform(options):
     return run_terraform_command('apply')
 
 
-def apply_terraform_with_variable(machines_to_run, vultr_api_key):
+def apply_terraform_with_variable(machines_to_run):
     """
     Apply Terraform configurations with the given machine names.
 
@@ -43,8 +43,7 @@ def apply_terraform_with_variable(machines_to_run, vultr_api_key):
     #First, plan the changes and confirm user approval
     plan_cmd = [
         'terraform', f'-chdir={script_dir}/terraform', 'plan', # specifies where config file is found
-        f'-var=machines_to_run={machine_json}',
-        f'-var=vultr_api_key={vultr_api_key}',
+        f'-var=machines_to_run={machine_json}'
     ]
     
     print("Running Terraform plan...")
@@ -57,8 +56,7 @@ def apply_terraform_with_variable(machines_to_run, vultr_api_key):
         apply_cmd = [
             'terraform', f'-chdir={script_dir}/terraform', 'apply', # specifies where config file is found
             '-auto-approve',  # Skip interactive approval; use cautiously!
-            f'-var=machines_to_run={machine_json}',
-            f'-var=vultr_api_key={vultr_api_key}',
+            f'-var=machines_to_run={machine_json}'
         ]
         print("Running Terraform apply...")
         
@@ -99,5 +97,4 @@ if __name__ == "__main__":
     with open("configure/config.json", "r") as file:
         config = json.load(file)
         name_region_dict = config["vultr_regions"]
-        vultr_api_key = config["vultr_api_key"]
-    apply_terraform_with_variable(name_region_dict, vultr_api_key)
+    apply_terraform_with_variable(name_region_dict)

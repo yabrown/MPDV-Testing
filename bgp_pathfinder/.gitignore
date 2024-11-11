@@ -47,7 +47,7 @@ terraform.rc
 # Key files
 *.key
 
-keys/
+keys/vultr/*
 .DS_Store
 *.tmp
 __pycache__/
