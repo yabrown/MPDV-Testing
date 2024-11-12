@@ -2,9 +2,22 @@
 
 ## Overview
 
-This codebase tests the resilience of a Certificate Authority (CA) implementation using Multiple Perspective Issuance Control (MPIC). It sets up or takes an existing configuration of multiple servers and runs simulated hijacks between every possible server pair. For each hijack, it records which perspective (server) contacted which target server, providing insights into the CA’s MPIC resilience.
+This codebase tests the resilience of a Certificate Authority (CA) implementation using Multiple Perspective Issuance Control (MPIC). It sets up or takes an existing configuration of multiple servers and runs simulated hijacks between every pair of servers. For each hijack, it records which perspective (server) contacted which target server, providing insights into the CA’s MPIC resilience.
 
-## Getting Started
+## For Developers
+- There are three kinds of files that should not be modified by anyone other than the maintainer of this codebase:
+   - Configuration/state files-- these are specific to each attack sequence (servers, CA information, last attack, etc.)
+   - Sensitive files-- these are specific to a user, and contain secret information (API/SSH keys)
+   - Log files-- these log the results of an attack
+If you plan on modifying and pushing any code, run the following commands before doing so:
+```bash
+git update-index --skip-worktree terraform/variables.tf
+git update-index --skip-worktree results/*.log
+git update-index --skip-worktree results/*.json
+```
+This ensures that no sensitive or instance-specific files are pushed to the remote repository, which is visible to others.
+This will ensure you will not accidentally push configuration state files, which are unique to a users configuration
+## Using this package
 
 ### Configuration Setup
 
@@ -16,19 +29,16 @@ Ensure you have Terraform downloaded onto your computer. Before running the code
      cp configure/config.template configure/config.json
      ```
 
-(TODO: these next parts should be subpoints of the above)
-2. **Configure (or create) servers**:
+2. **Configure (or create) servers to use as nodes**:
    - The attack sequence requires a set of geographically dispersed Vultr nodes using the same SSH key. You can either use your own existing set, or have servers be automatically provisioned. 
    - **To use existing servers**: 
       - In configure/config.json, set `nodes` to a list of server names mapped to their IP addresses. 
          - Note that the server names used are not required to match any external configuration-- they will simply be the names used to identify the servers throughout this attack. But for the sake of clarity, we recommend using their hostnames.
    - **To automatically provisioning servers**:
-   TODO: add key specifiers
       - If you want the code to create servers for you, do the following:
          - In terraform/variables.tf, insert your Vultr API key
          - In `config.json`, set 'regions' to a list of node names mapped to the Vultr regions you want them in
             - Note that the server names used are not required to match any external configuration-- they will simply be the names used to identify the servers throughout this attack. But for the sake of clarity, we recommend using their hostnames.
-         
          - In bgp_pathfinder/keys/vultr, create a file called vultr.pem. Place in it the SSH private key being used by your servers--they should all use the same one--followed by a newline. Set the permissons for that the file to 700.
          - In the root directory, run 
          ```bash 
@@ -41,7 +51,7 @@ Ensure you have Terraform downloaded onto your computer. Before running the code
 TODO: whole terraform provisioning thing has to go here. include instructions for what they should so at each point
 TODO: configuration thing config.sh
 3. **Configure Nodes**:
-   - Once the nodes exist, they must be configured with the tools needed to run the attack. From the root directory, run ./configure/config.sh
+   - Once the nodes are specified, they must be configured with the tools needed to run the attack. From the root directory, run ./configure/config.sh
 
 ### Running the attack
 - From the root directory, run 
