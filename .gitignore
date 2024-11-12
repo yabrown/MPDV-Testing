@@ -161,15 +161,24 @@ cython_debug/
 
 #sensitive info
 terraform/variables.tf
-terraform/terraform.tfstate
+
+#results stuff
+results/*.log
+results/state.json
+
+#terraform stuff
+terraform/
+!terraform/main.tf
 
 # unimportant
-screenlog.0
+screenlog.*
 scrap.txt
 results/logs/*
-results/state.json
+#results/state.json
 thoughts.md
-screenlog.watchdog
 config.json
 watchdog.py
 configure/config.json
+
+.DS_Store
+results/.DS_Store

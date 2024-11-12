@@ -36,7 +36,7 @@ resource "vultr_instance" "instance" {
   plan             = lookup(var.region_plans, each.value, "vc2-2c-4gb")
   region           = each.value
   os_id            = 1743
-  ssh_key_ids      = ["b1062298-c96c-496c-90f8-ce21aaf97417"]
+  ssh_key_ids      = var.ssh_key_id
   backups          = "disabled"
   label            = each.key
   hostname         = each.key
