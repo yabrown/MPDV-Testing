@@ -9,6 +9,14 @@ from abc import ABC, abstractmethod
 import json
 from utils.node import Node
 
+class NodeRequestError(Exception):
+    """Raised when there is an issue with a node request."""
+    pass
+
+class NodeResponseError(Exception):
+    """Raised when the node response is invalid."""
+    pass
+
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
 # Factory function to initialize the appropriate subclass
@@ -39,16 +47,27 @@ class CertReq(ABC):
         pass
 
     def get_results(self, token):
-        try: 
+        node_a_ips = []
+        node_b_ips = []
+        try:
             response = requests.get(f"http://{self.node_a.ip}/getips?token={token}")
+            response.raise_for_status()
             node_a_ips = response.json()['ip_addresses']
-        except Exception as e:
-            raise(f"Error making request to {self.node_a.name} ({self.node_a.ip}): {e}")
-        try: 
+        except requests.exceptions.RequestException as e:
+            raise NodeRequestError(f"Error making request to {self.node_a.name} ({self.node_a.ip}): {e}")
+        except NodeResponseError as e:
+            print(f"Error: {self.node_a.name} ({self.node_a.ip}) has no attribute 'ip_addresses'")
+
+        try:
             response = requests.get(f"http://{self.node_b.ip}/getips?token={token}")
+            response.raise_for_status()
             node_b_ips = response.json()['ip_addresses']
-        except Exception as e:
-            raise(f"Error making request to {self.node_b.name} ({self.node_b.ip}): {e}")
+        except requests.exceptions.RequestException as e:
+            raise NodeRequestError(f"Error making request to {self.node_b.name} ({self.node_b.ip}): {e}")
+        except KeyError as e:
+            raise NodeResponseError(f"Error: {self.node_b.name} ({self.node_b.ip}) has no attribute 'ip_addresses'")
+        
+
         return node_a_ips, node_b_ips
 
     # Get a successful request and returns the corresponding 
