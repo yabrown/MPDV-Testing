@@ -156,14 +156,15 @@ class LECertREq(CertReq):
     def get_request():
         return
     def send_request(self):
+        certbot_tools = "~/certbot_tools"
         subprocess.run([
             "certbot",
             "certonly",
             "--manual",
-            "--manual-auth-hook", "./authenticator.sh",
-            "--manual-cleanup-hook", "./cleanup.sh",
+            "--manual-auth-hook", f"{certbot_tools}/authenticator.sh",
+            "--manual-cleanup-hook", f"{certbot_tools}/cleanup.sh",
             "--dry-run",
             "-d", "sajghfgfhsdfasdf.arins.pretend-crypto-wallet.com"
         ])
-        with open(os.path.expanduser("~/certbot_tools/token"), "r") as file:
+        with open(os.path.expanduser(f"{certbot_tools}/token"), "r") as file:
             return file.read().strip()
