@@ -156,7 +156,7 @@ class LECertREq(CertReq):
     def get_request():
         return
     def send_request(self):
-        certbot_tools = "~/certbot_tools"
+        certbot_tools = os.path.expanduser("~/certbot_tools")
         subprocess.run([
             "certbot",
             "certonly",
@@ -166,5 +166,5 @@ class LECertREq(CertReq):
             "--dry-run",
             "-d", "sajghfgfhsdfasdf.arins.pretend-crypto-wallet.com"
         ])
-        with open(os.path.expanduser(f"{certbot_tools}/token"), "r") as file:
+        with open(f"{certbot_tools}/token", "r") as file:
             return file.read().strip()
