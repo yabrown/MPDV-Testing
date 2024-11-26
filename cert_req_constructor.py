@@ -24,6 +24,8 @@ class CertificateRequestFactory:
             return OMCertReq(node_a, node_b)
         elif ca_name == "cf":
             return CFCertReq(node_a, node_b)
+        elif ca_name=="le":
+            return LECertREq(node_a, node_b)
         else:
             raise ValueError(f"Unknown certificate authority: {ca_name}")
 
@@ -49,6 +51,7 @@ class CertReq(ABC):
             raise(f"Error making request to {self.node_b.name} ({self.node_b.ip}): {e}")
         return node_a_ips, node_b_ips
 
+    # Get a successful request and returns the corresponding 
     def send_request(self):
         retries = 5
         for attempt in range(retries):
