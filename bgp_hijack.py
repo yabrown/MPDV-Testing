@@ -12,163 +12,38 @@ import json
 from bgp_pathfinder.pathfinder import main as pathfinder
 from bgp_pathfinder.send_cmd import main as send_cmd
 from bgp_pathfinder.engines.vultr import copy_file_from_node_name as copy_file
+from cert_req_constructor import CertificateRequestFactory as CertReqFactory
+from utils.node import Node
 
 dir_path = os.path.dirname(os.path.realpath(__file__)) 
 
-def ips_from_file(filename, token):
-  ip_pattern = re.compile(r'^(\d{1,3}\.){3}\d{1,3}')
-  ips = []
-  with open(filename, 'r') as file:
-    for line in file:
-      if token in line:
-        ip = ip_pattern.match(line)
-        if not ip: print(f"IP not found in matched line: {line}")
-        ips.append(ip)
-  return ips
 
-def retry_until_success(clear_logs, cert_req_dict, node_a, node_b):
-  retries = 5
-  for attempt in range(retries):
-      send_cmd([clear_logs, "-d", node_a, node_b])
-      response = requests.post(**cert_req_dict)
-      with open(f"{dir_path}/results/http.log", 'a') as file:
-          now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] + 'Z'
-          if attempt>0: file.write(f"Attempt {attempt}:\n")
-          file.write(f"\t{now} {cert_req_dict}\n")
-          print(f"\t{now} {cert_req_dict}")
-          file.write(f"\t{now} {response.text}\n")
-          print(f"\t{now} {response.text}\n")
-      if response.status_code == 200:
-          break
-      elif attempt < retries - 1:
-          print(f"Attempt {attempt + 1} failed with status code {response.status_code}. Waiting 10 seconds and retrying...")
-          time.sleep(10)
-      else:
-          # log error
-          with open(f"{dir_path}/results/errors.log", 'a') as file:
-            file.write(f"{node_a},{node_b}:\tHTTP Error: Failed after {retries} attempts with final status code {response.status_code}\n")
-
-
-# Function that makes a single cert req and pulls the resulting logs from both nodes
-def cert_request_and_log(cert_name, cert_req_dict, node_a, node_b):
-
-  #name files (first node is origin of log, second is hijack partner)
-  a_filename = f"{node_a}_{node_b}_{cert_name}.log"
-  b_filename = f"{node_b}_{node_a}_{cert_name}.log"
-  # command to clear log files
-  clear_logs = textwrap.dedent('''
-    > /var/log/apache2/access.log;
-    > /var/log/bind/query;
-  ''')
-  # command to pull from log files to create summary
-  compose_log = lambda filename: textwrap.dedent(f'''
-    > {filename};
-    echo -e \"\tHTTP REQUESTS:\" >> {filename};
-    cat /var/log/apache2/access.log >> {filename};
-    echo -e \"\n\tDNS REQUESTS:\" >> {filename};
-    cat /var/log/bind/query >> {filename};
-    > /var/log/apache2/access.log;
-    > /var/log/bind/query;
-  ''')
-
-  retry_until_success(clear_logs, cert_req_dict, node_a, node_b)
-
-  # create and compose log files in both nodes
-  send_cmd([compose_log(a_filename), "-d", node_a]) # run at A, name a-b
-  send_cmd([compose_log(b_filename), "-d", node_b]) # run at B, name b-a
-
-  # copy files over locally from both nodes
-  copy_file(a_filename, node_a, "./results/logs")
-  copy_file(b_filename, node_b, "./results/logs")
-
-  # get IPs
-  token = "hijacks_are_bad"
-  node_a_ips = ips_from_file(f"./results/logs/{a_filename}", token)
-  node_b_ips = ips_from_file(f"./results/logs/{b_filename}", token)
-  print(f"Extracted IP's:\n{node_a}:\t{node_a_ips}\n{node_b}:\t{node_b_ips}")
-
-
-  #log the relevant information
-  with open(f"{dir_path}/results/summary.log", 'a') as file:
-    now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] + 'Z'
-    formatted_line = f'{now}\tPair: {node_a}, {node_b}:\t\t{len(node_a_ips)}, {len(node_b_ips)}\tTotal: {len(node_a_ips)+len(node_b_ips)}\n'
-    file.write(formatted_line)
-
-
-def attack(node_a, node_b):
-  args = ["-d", node_a,  node_b, "-i", "66.180.191.0/24"]
+def attack(ca_list, node_a: Node, node_b: Node):
+  args = ["-d", node_a.name,  node_b.name, "-i", "66.180.191.0/24"]
   pathfinder(["-w"])  # make announcments-- equivalent of calling pathfinder from command line with above args
   pathfinder(args)    # make announcments-- equivalent of calling pathfinder from command line with above args
 
   # wait five minutes
-  time.sleep(300)
+  time.sleep(30)
   
   start = time.time()
-  rand = random.randint(0, 100_000_000)
   
-  gg_prem_name = "ggp"
-  gg_prem_req = {
-      "url": "http://34.75.246.52:5000/run-all",
-      "headers": {
-         'Content-Type': 'application/json'
-      },
-      "json": {
-        "domain": "123123123.arins.pretend-crypto-wallet.com",
-        "token": "hijacks_are_bad",
-        "node_a": node_a,
-        "node_b": node_b
-      }
-  }
-  gg_free_name = "ggf"
-  gg_free_req = {
-      "url": "http://35.211.239.179:5000/run-all",
-      "headers": {
-        'Content-Type': 'application/json'
-      },
-      "json": {
-        "domain": "123123123.arins.pretend-crypto-wallet.com",
-        "token": "hijacks_are_bad",
-        "node_a": node_a,
-        "node_b": node_b
-      }
-  }
-
-  with open("configure/config.json", "r") as file:
-    open_mpic_api_key = json.load(file)["mpic_api_key"]
-  open_mpic_name = "om"
-  open_mpic_req = {
-     "url": "https://anor3x6mtj.execute-api.us-east-2.amazonaws.com/v1/mpic",
-     "headers": {
-      "Content-Type": "application/json",
-        "x-api-key": open_mpic_api_key
-     },
-     "json": {
-        "orchestration_parameters": {
-          "perspective_count": 13,
-          "max_attempts": 1
-        },
-        "check_type": "dcv",
-        "domain_or_ip_target": "123233.arins.pretend-crypto-wallet.com",
-        "dcv_check_parameters": {
-          "validation_method": "http-generic",
-          "validation_details": {
-            "http_token_path": "/bgp_hijacks_are_bad",
-            "challenge_value": "test"
-          }
-        }
-     }
-  }
   with open(f"{dir_path}/results/http.log", 'a') as file:
-      file.write(f"{node_a}, {node_b}:\n")
-  cert_request_and_log(open_mpic_name, open_mpic_req, node_a, node_b)
-  cert_request_and_log(gg_prem_name, gg_prem_req, node_a, node_b)
-  cert_request_and_log(gg_free_name, gg_free_req, node_a, node_b)
+      file.write(f"{node_a.name}, {node_b.name}:\n")
+  
+  attack_results = {}
+  for ca in ca_list:
+    attack_results[ca] = {}
+    cert_req =CertReqFactory.create(ca, node_a, node_b)
+    token = cert_req.send_request()
+    attack_results[ca][node_a.name], attack_results[ca][node_b.name] = cert_req.get_results(token)
+
 
   end = time.time()
   print("Total time for all attacks between this pair of nodes= ", end-start)
+  
+  return attack_results
 
-
- 
 if __name__ == "__main__":
   script_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -185,7 +60,7 @@ if __name__ == "__main__":
     node_a = sys.argv[2*i+1]
     node_b = sys.argv[2*i+2]
     start = time.time()
-    attack(node_a, node_b)
+    node_a_ips, node_b_ips = attack(node_a, node_b)
     end = time.time()
     print("Total attack time = ", end-start)
     

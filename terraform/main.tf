@@ -36,14 +36,16 @@ resource "vultr_instance" "instance" {
   plan             = lookup(var.region_plans, each.value, "vc2-2c-4gb")
   region           = each.value
   os_id            = 1743
-  ssh_key_ids      = var.ssh_key_id
+  ssh_key_ids      = [var.ssh_key_id]
   backups          = "disabled"
   label            = each.key
   hostname         = each.key
   enable_ipv6      = true
   ddos_protection  = false
   activation_email = false
+  script_id = "39620c49-ee2e-4987-9c5c-48be03296987"
 }
+
 output "node_ips" {
   value = { for instance in vultr_instance.instance : instance.hostname => instance.main_ip }
 }

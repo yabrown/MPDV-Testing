@@ -7,43 +7,83 @@ import signal
 import threading
 import sys
 import traceback
+from utils.node import Node
+from utils.loggers import http_logger, summary_logger, error_logger
 
 
-def load_nodes_from_config():
+def load_config():
   try:
     with open('configure/config.json', 'r') as file:
       config = json.load(file)
-      nodes = [node for node in config['nodes'].keys() if node != "main"] # filter out 'main'
-    return nodes
+      return config
   except Exception as error:
     raise error
   
-def load_state_from_file():
+def load_state():
   try:
       with open('results/state.json', 'r') as file:
           state_data = json.load(file)
       return state_data
   except Exception as error:
       raise error
+  
+def initialize_result_files(ca_list, node_names):
+  data = {}
+  for node in node_names:
+    other_nodes = {other_node: [] for other_node in node_names if other_node!=node}
+    data[node] = other_nodes
+  for ca in ca_list:
+    with open(f'results/{ca}_results.json', 'w') as file:
+      json.dump(data, file)
+      
+  
+def record_results(attack_results):
+  for ca in attack_results.keys(): 
+    with open(f'results/{ca}_results.json', 'r') as file:
+      results = json.load(file)
+    
+    # Update results for the node pairs
+    node_a, node_b = list(attack_results[ca].keys())
+    results[node_a][node_b] = attack_results[ca][node_a]
+    results[node_b][node_a] = attack_results[ca][node_b]
+
+    with open(f'results/{ca}_results.json', 'w') as file:
+      json.dump(results, file, indent=4)
+  
 
 
 if __name__ == "__main__":
-  nodes = load_nodes_from_config()
-  state = load_state_from_file()
+  config = load_config()
+  state = load_state()
+  ca_list = config['certificate_authorities']
+  node_objects = [Node(name, ip) for name, ip in config['nodes'].items()]
+  node_names = list(config['nodes'].keys())
 
+  # if this is a new run, reinitialize result files
+  initialize_result_files(ca_list, node_names)
   # starting point depends on whether we're continuing a previous run
-  a_start = nodes.index(state['curr_node_a']) if state['mid_test'] == True else 0
-  b_start = nodes.index(state['curr_node_b']) if state['mid_test'] == True else a_start+1
+  a_start_index = node_names.index(state['curr_node_a']) if state['mid_test'] == True else 0
+  b_start_index = node_names.index(state['curr_node_b']) if state['mid_test'] == True else a_start_index+1
 
-  for i, node_a in enumerate(nodes[a_start:], start=a_start):
-    for node_b in nodes[b_start if i==a_start else i+1:]:
+  for i, node_a in enumerate(node_objects[a_start_index:], start=a_start_index):
+    for node_b in node_objects[b_start_index if i==a_start_index else i+1:]:
       # update state file to current attack pair
       with open('results/state.json', 'w') as file:
         state['mid_test'] = True
-        state['curr_node_a'] = node_a
-        state['curr_node_b'] = node_b
+        state['curr_node_a'] = node_a.name
+        state['curr_node_b'] = node_b.name
         json.dump(state, file)
-      attack(node_a, node_b)
+      attack_results = attack(ca_list, node_a, node_b)
+      record_results(attack_results)
+      for ca in ca_list:
+        node_a_ips_len = len(attack_results[ca][node_a.name])
+        node_b_ips_len = len(attack_results[ca][node_b.name])
+        total = node_a_ips_len + node_b_ips_len
+        summary_logger.info(f"Pair: {node_a.name:<15}, {node_b.name:<15}:\t{node_a_ips_len:<2}, {node_b_ips_len:<2}\tTotal: {total:>2}"
+        
+)
+
+
 
   with open('results/state.json', 'w') as file:
     state['mid_test'] = False
