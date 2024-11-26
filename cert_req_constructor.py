@@ -165,5 +165,5 @@ class LECertREq(CertReq):
             "--dry-run",
             "-d", "sajghfgfhsdfasdf.arins.pretend-crypto-wallet.com"
         ])
-        with open(os.path.expanduser("~/token"), "r") as file:
+        with open(os.path.expanduser("~/certbot_tools/token"), "r") as file:
             return file.read().strip()
