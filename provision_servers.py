@@ -43,7 +43,7 @@ def apply_terraform_with_variable(machines_to_run):
     #First, plan the changes and confirm user approval
     plan_cmd = [
         'terraform', f'-chdir={script_dir}/terraform', 'plan', # specifies where config file is found
-        f'-var=machines_to_run={machine_json}'
+        f'-var=machines_to_run={machine_json}', "-out=plan.tfplan" 
     ]
     
     print("Running Terraform plan...")
@@ -54,9 +54,7 @@ def apply_terraform_with_variable(machines_to_run):
     
     if response.lower() == "yes":
         apply_cmd = [
-            'terraform', f'-chdir={script_dir}/terraform', 'apply', # specifies where config file is found
-            '-auto-approve',  # Skip interactive approval; use cautiously!
-            f'-var=machines_to_run={machine_json}'
+            'terraform', f'-chdir={script_dir}/terraform', 'apply', 'plan.tfplan', # specifies where config file is found
         ]
         print("Running Terraform apply...")
         

@@ -7,15 +7,7 @@ import string
 import subprocess
 from abc import ABC, abstractmethod
 import json
-from utils.node import Node
-
-class NodeRequestError(Exception):
-    """Raised when there is an issue with a node request."""
-    pass
-
-class NodeResponseError(Exception):
-    """Raised when the node response is invalid."""
-    pass
+from utils.node import Node, NodeResponseError, NodeRequestError
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -66,7 +58,7 @@ class CertReq(ABC):
             raise NodeRequestError(f"Error making request to {self.node_b.name} ({self.node_b.ip}): {e}")
         except KeyError as e:
             raise NodeResponseError(f"Error: {self.node_b.name} ({self.node_b.ip}) has no attribute 'ip_addresses'")
-        
+            
 
         return node_a_ips, node_b_ips
 

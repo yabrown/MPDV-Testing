@@ -13,7 +13,7 @@ from bgp_pathfinder.pathfinder import main as pathfinder
 from bgp_pathfinder.send_cmd import main as send_cmd
 from bgp_pathfinder.engines.vultr import copy_file_from_node_name as copy_file
 from cert_req_constructor import CertificateRequestFactory as CertReqFactory
-from utils.node import Node
+from utils.node import Node, NodeRequestError, NodeResponseError
 
 dir_path = os.path.dirname(os.path.realpath(__file__)) 
 
@@ -36,8 +36,10 @@ def attack(ca_list, node_a: Node, node_b: Node):
     attack_results[ca] = {}
     cert_req =CertReqFactory.create(ca, node_a, node_b)
     token = cert_req.send_request()
-    attack_results[ca][node_a.name], attack_results[ca][node_b.name] = cert_req.get_results(token)
-
+    try:
+      attack_results[ca][node_a.name], attack_results[ca][node_b.name] = cert_req.get_results(token)
+    except NodeRequestError as e:
+      raise(e)
 
   end = time.time()
   print("Total time for all attacks between this pair of nodes= ", end-start)
