@@ -134,7 +134,7 @@ class GGFCertReq(CertReq):
 class GGPCertReq(CertReq):
     def get_request(self, token):
         return {
-            "url": "http://34.75.246.52:5000/run-all",
+            "url": "http://34.148.238.226:5000/run-all",
             "headers": {
                 "Content-Type": "application/json"
             },

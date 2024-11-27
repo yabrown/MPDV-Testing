@@ -12,9 +12,5 @@ echo "*******UPDATED PATHFINDER CONFIG FILES*******"
 # Test that everything works
 python3 "$SCRIPT_DIR/../bgp_pathfinder/send_cmd.py" "hostname"
 
-# Configure nodes for pathfinder
-echo "*******CONFIGURING NODES FOR PATHFINDER*******"
-"$SCRIPT_DIR/../bgp_pathfinder/scripts/configure_nodes.sh"
-
 # Wait for all background jobs to finish
 wait
