@@ -94,7 +94,7 @@ class CertReq(ABC):
 class OMCertReq(CertReq):
     def get_request(self, token):
         return {
-            "url": "https://anor3x6mtj.execute-api.us-east-2.amazonaws.com/v1/mpic",
+            "url": "https://13-230-4-111.mpic-deploy.henrybirgelee.com/mpic",
             "headers": {
             "Content-Type": "application/json",
             "x-api-key": os.environ['MPIC_API_KEY']

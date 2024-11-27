@@ -24,7 +24,7 @@ def attack(ca_list, node_a: Node, node_b: Node):
   pathfinder(args)    # make announcments-- equivalent of calling pathfinder from command line with above args
 
   # wait five minutes
-  time.sleep(30)
+  time.sleep(300)
   
   start = time.time()
   
