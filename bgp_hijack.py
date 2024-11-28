@@ -43,6 +43,7 @@ def attack(ca_list, node_a: Node, node_b: Node):
 
   end = time.time()
   print("Total time for all attacks between this pair of nodes= ", end-start)
+  attack_results[ca]['time'] = end-start
   
   return attack_results
 

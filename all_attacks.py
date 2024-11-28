@@ -79,9 +79,9 @@ if __name__ == "__main__":
         node_a_ips_len = len(attack_results[ca][node_a.name])
         node_b_ips_len = len(attack_results[ca][node_b.name])
         total = node_a_ips_len + node_b_ips_len
-        summary_logger.info(f"Pair: {node_a.name:<15}, {node_b.name:<15}:\t{node_a_ips_len:<2}, {node_b_ips_len:<2}\tTotal: {total:>2}"
-        
-)
+        time = attack_results[ca]['time']
+        summary_logger.info(f"Pair: {node_a.name:<15}, {node_b.name:<15}:\t{node_a_ips_len:<2}, {node_b_ips_len:<2}\tTotal: {total:>2}\tTime: {time:.2f}s")
+
 
 
 

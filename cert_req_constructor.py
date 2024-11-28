@@ -85,8 +85,9 @@ class CertReq(ABC):
             now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] + 'Z'
             file.write(f"\t{now} {cert_req}\n")
             print(f"\t{now} {cert_req}")
-            file.write(f"\t{now} {response.text}\n")
-            print(f"\t{now} {response.text}\n")
+            filtered_response = {key: value for key, value in response.json().items() if key != 'perspectives'} #filters out long list of OM VP's
+            file.write(f"\t{now} {filtered_response}\n")
+            print(f"\t{now} {filtered_response}\n")
         return response, token
         
 
