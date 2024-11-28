@@ -110,7 +110,7 @@ class OMCertReq(CertReq):
                 "dcv_check_parameters": {
                     "validation_method": "http-generic",
                     "validation_details": {
-                        "http_token_path": f"validate?token={token}",
+                        "http_token_path": token,
                         "challenge_value": "test"
                     }
             }
