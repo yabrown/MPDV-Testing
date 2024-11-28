@@ -43,7 +43,7 @@ def record_results(attack_results):
       results = json.load(file)
     
     # Update results for the node pairs
-    node_a, node_b = list(attack_results[ca].keys())
+    node_a, node_b = list(attack_results[ca].keys())[:2]
     results[node_a][node_b] = attack_results[ca][node_a]
     results[node_b][node_a] = attack_results[ca][node_b]
 
