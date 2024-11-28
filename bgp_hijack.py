@@ -26,11 +26,11 @@ def attack(ca_list, node_a: Node, node_b: Node):
   # wait five minutes
   time.sleep(300)
   
-  start = time.time()
   
   with open(f"{dir_path}/results/http.log", 'a') as file:
       file.write(f"{node_a.name}, {node_b.name}:\n")
   
+  start = time.time()
   attack_results = {}
   for ca in ca_list:
     attack_results[ca] = {}
@@ -38,12 +38,13 @@ def attack(ca_list, node_a: Node, node_b: Node):
     token = cert_req.send_request()
     try:
       attack_results[ca][node_a.name], attack_results[ca][node_b.name] = cert_req.get_results(token)
+      end = time.time()
+      attack_results[ca]['time'] = end-start
     except NodeRequestError as e:
       raise(e)
 
   end = time.time()
   print("Total time for all attacks between this pair of nodes= ", end-start)
-  attack_results[ca]['time'] = end-start
   
   return attack_results
 
